@@ -1,0 +1,159 @@
+<#
+.synopsis
+Welcome to my Menu. Provides options for: Firewalls, Network and Drives. 
+
+.description
+You can acces a total of 3 submenus.
+Firewalls Menu - Start, Stop the Firewall as well as view 
+#>
+ 
+ do
+{
+clear
+write-output "======== Menu Select ========"
+write-output "Select an option "
+write-output "A: Open Firewalls Menu"
+write-output "B: Open Networking Menu"
+write-output "C: Open Drives Menu"
+write-output "E: Exit"
+
+$menuselect = read-host "Select a menu option"
+switch ($menuselect)
+
+    {
+    'A'
+        {
+            clear
+            write-output "======== Firewalls Menu ========"
+            write-output "Select an option "
+            write-output "A1: Start Firewall"
+            write-output "A2: Stop Firewall"
+            write-output "A3: Sort Firewall Rules By First 10 and Inbound First"
+            write-output "A4: Exit"
+            $submenu1 = read-host "Select a menu option"
+            switch ($submenu1)
+            {
+        'A1'
+            {
+            set-netfirewallprofile -profile Domain,Public,Private -Enabled True
+            write-output " "
+            write-output "The Firewall Has Now Started"
+            pause
+            clear
+            }
+
+          'A2'
+            {
+            set-netfirewallprofile -profile Domain,Public,Private -Enabled False
+            write-output " "
+            write-output "The Firewall Has Now Stopped"
+            pause
+            clear
+            }
+
+          'A3'
+            {
+            get-NetFirewallRule | select-object displayname, direction, Action -First 10 | sort-object direction
+            write-output " "
+            write-output "The First 10 Rules Are Now Displayed "
+            pause
+            clear
+            }
+        }
+
+
+        pause
+        }
+
+       'B'
+       {
+       
+            clear
+            write-output "======== Networking Configuration Menu ========"
+            write-output "Select an option "
+            write-output "B1: Show IP Addresses Information - Sorted By IPv4 Addresses First"
+            write-output "B2: Show Network Adapter Information"
+            write-output "B3: Show All Running Network Services"
+            write-output "B4: Send IP Information to a HTML File"
+            write-output "B5: Exit"
+            $networkmenu = read-host "Select a menu option"
+            switch ($networkmenu)
+        {
+        'B1'
+            {
+            get-netipaddress | select-object IPAddress, AddressFamily, PrefixLength | sort-object AddressFamily
+            pause
+            clear
+            }
+
+          'B2'
+            {
+            Get-NetAdapter | select-object Name, Status, MacAddress, LinkSpeed
+            write-output "Viewing Network Adapter Information"
+            pause
+            clear
+            }
+
+          'B3'
+            {
+            get-service | select-object displayname, status | where-object displayname -like "Network*" | Sort-Object Status -Descending
+            write-output "Viewing All Network Services And Status Running First "
+            pause
+            clear
+            }
+
+            'B4'
+            {
+            get-netipaddress | select-object IPAddress, AddressFamily, PrefixLength | sort-object AddressFamily | convertto-html | out-file C:\IPHTMLFile.html
+            write-output "Information has been sent to a HTML File - Located in C Drive Named IPHTMLFile. "
+            pause
+            clear
+            }
+
+
+              }  
+        
+
+
+        pause
+
+        }
+
+    'C'
+        {
+                
+
+        clear
+        write-output "======== Drive Information Menu ========"
+        write-output "Select an option "
+        write-output "C1: View Drive Information"
+        write-output "C2: View Disk Information"
+        write-output "C3: Exit"
+        
+        $drivemenu = read-host "Select a menu option"
+        switch ($drivemenu)
+
+        {
+        'C1'
+            {
+            Get-WmiObject -Class Win32_logicaldisk | select-object DeviceID, FreeSpace, Size | Sort-object FreeSpace -Descending
+            write-output "Viewing Drive Information"
+            pause
+            clear
+            }
+
+          'C2'
+            {
+            Get-Disk | select-object FriendlyName, HealthStatus, TotalSize, PartitionStyle, Number
+            write-output "Viewing Disk Information "
+            pause
+            clear
+            }
+
+      }
+    }
+  }
+}
+
+Until ($menuselect -EQ 'E')
+    
